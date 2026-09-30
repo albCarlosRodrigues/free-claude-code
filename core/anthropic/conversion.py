@@ -49,6 +49,12 @@ class AnthropicToOpenAIConverter:
                     result.extend(
                         AnthropicToOpenAIConverter._convert_user_message(content)
                     )
+                elif role == "system":
+                    system_msg = AnthropicToOpenAIConverter.convert_system_prompt(
+                        content
+                    )
+                    if system_msg:
+                        result.append(system_msg)
             else:
                 result.append({"role": role, "content": str(content)})
 
