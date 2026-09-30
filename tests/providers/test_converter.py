@@ -468,3 +468,31 @@ def test_convert_multiple_tool_results():
     assert len(result) == 2
     assert result[0]["tool_call_id"] == "t1"
     assert result[1]["tool_call_id"] == "t2"
+
+
+def test_convert_system_message_blocks_preserves_order_and_text():
+    messages = [
+        MockMessage("user", "First"),
+        MockMessage(
+            "system",
+            [
+                MockBlock(type="text", text="Instruction A"),
+                MockBlock(type="text", text="Instruction B"),
+            ],
+        ),
+        MockMessage("user", "Last"),
+    ]
+
+    assert AnthropicToOpenAIConverter.convert_messages(messages) == [
+        {"role": "user", "content": "First"},
+        {"role": "system", "content": "Instruction A\n\nInstruction B"},
+        {"role": "user", "content": "Last"},
+    ]
+
+
+def test_convert_system_message_string():
+    messages = [MockMessage("system", "Follow this instruction")]
+
+    assert AnthropicToOpenAIConverter.convert_messages(messages) == [
+        {"role": "system", "content": "Follow this instruction"}
+    ]
