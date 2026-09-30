@@ -126,3 +126,34 @@ def test_messages_request_accepts_redacted_thinking_blocks():
         "type": "redacted_thinking",
         "data": "opaque",
     }
+
+
+def test_messages_request_accepts_system_message_in_messages():
+    request = MessagesRequest.model_validate(
+        {
+            "model": "claude-3-sonnet",
+            "messages": [
+                {"role": "user", "content": "Hello"},
+                {
+                    "role": "system",
+                    "content": [{"type": "text", "text": "Follow this instruction"}],
+                },
+            ],
+        }
+    )
+
+    assert request.messages[1].role == "system"
+    assert request.model_dump()["messages"][1]["content"] == [
+        {"type": "text", "text": "Follow this instruction"}
+    ]
+
+
+def test_token_count_request_accepts_system_message_in_messages():
+    request = TokenCountRequest.model_validate(
+        {
+            "model": "claude-3-sonnet",
+            "messages": [{"role": "system", "content": "Follow this instruction"}],
+        }
+    )
+
+    assert request.messages[0].role == "system"
