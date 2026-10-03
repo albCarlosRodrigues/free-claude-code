@@ -8,6 +8,8 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel
 
+from core.anthropic.request import normalize_system_messages
+
 OPENROUTER_DEFAULT_MAX_TOKENS = 81920
 
 _REQUEST_FIELDS = (
@@ -154,6 +156,7 @@ def build_request_body(request_data: Any, *, thinking_enabled: bool) -> dict:
     if isinstance(request_extra, dict):
         body.update(request_extra)
 
+    normalize_system_messages(body)
     body["messages"] = _strip_unsigned_thinking_history(body.get("messages"))
     if "system" in body:
         body["system"] = _normalize_system_prompt(body["system"])
