@@ -10,6 +10,7 @@ import httpx
 from loguru import logger
 
 from core.anthropic import get_user_facing_error_message
+from core.anthropic.request import normalize_system_messages
 from providers.base import BaseProvider, ProviderConfig
 from providers.error_mapping import map_error
 from providers.rate_limit import GlobalRateLimiter
@@ -63,6 +64,7 @@ class AnthropicMessagesTransport(BaseProvider):
         """Build a native Anthropic request body."""
         thinking_enabled = self._is_thinking_enabled(request)
         body = request.model_dump(exclude_none=True)
+        normalize_system_messages(body)
 
         body.pop("extra_body", None)
         body.pop("original_model", None)
